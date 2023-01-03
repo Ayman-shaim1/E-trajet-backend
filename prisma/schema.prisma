@@ -10,20 +10,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Utilisteur {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  nomcomplete  String
+model Compte {
+  id           String        @id @default(uuid())
+  email        String        @unique
   motdepasse   String
-  isNormalUser Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Proprietaire Proprietaire?
+  Passager     Passager?
+}
+
+model Proprietaire {
+  id          String @id @default(uuid())
+  nomComplete String
+  Gsm         String
+  fixe        String
+  adresse     String
+
+  compte   Compte @relation(fields: [idCompte], references: [id])
+  idCompte String @unique
+
+  MoyenneDeTransport MoyenneDeTransport?
+
+  Voyage Voyage[]
+}
+
+model Passager {
+  id          String @id @default(uuid())
+  nomComplete String
+  fixe        String
+  adresse     String
+
+  compte   Compte @relation(fields: [idCompte], references: [id])
+  idCompte String @unique
+
+  Voyage Voyage[]
+}
+
+model MoyenneDeTransport {
+  id             String  @id @default(uuid())
+  nom            String
+  isCalculable   Boolean @default(false)
+  cout_par_metre Float
+  description    String
+
+  proprietaire   Proprietaire @relation(fields: [idProprietaire], references: [id])
+  idProprietaire String       @unique
+
+  Voyage Voyage[]
 }
 
 model Place {
-  id          String @id @default(uuid())
-  nom         String
-  latitude    Float
-  longtitude  Float
-  description String
+  id                  String   @id @default(uuid())
+  nom                 String
+  latitude            Float
+  longtitude          Float
+  description         String
+  voyage_placeDepart  Voyage[] @relation("placeDepart")
+  voyage_placeArrivee Voyage[] @relation("placeArrivee")
+}
+
+model Voyage {
+  id                   String             @id @default(uuid())
+  dateVoyage           DateTime
+  statut               String
+  proprietaire         Proprietaire       @relation(fields: [idProprietaire], references: [id])
+  idProprietaire       String
+  moyenneDeTransport   MoyenneDeTransport @relation(fields: [idMoyenneDeTransport], references: [id])
+  idMoyenneDeTransport String
+  passager             Passager           @relation(fields: [idPassager], references: [id])
+  idPassager           String
+
+  placeDepart  Place  @relation("placeDepart", fields: [idPaceDepart], references: [id])
+  idPaceDepart String
+
+  placeArrivee  Place  @relation("placeArrivee", fields: [idPaceArrivee], references: [id])
+  idPaceArrivee String
 }
