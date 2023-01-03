@@ -30,9 +30,10 @@ model Proprietaire {
   compte   Compte @relation(fields: [idCompte], references: [id])
   idCompte String @unique
 
-  MoyenneDeTransport MoyenneDeTransport?
+  moyenneDeTransport   MoyenneDeTransport @relation(fields: [idMoyenneDeTransport], references: [id])
+  idMoyenneDeTransport String
 
-  Voyage Voyage[]
+  Voyages Voyage[]
 }
 
 model Passager {
@@ -44,7 +45,7 @@ model Passager {
   compte   Compte @relation(fields: [idCompte], references: [id])
   idCompte String @unique
 
-  Voyage Voyage[]
+  Voyages Voyage[]
 }
 
 model MoyenneDeTransport {
@@ -54,10 +55,8 @@ model MoyenneDeTransport {
   cout_par_metre Float
   description    String
 
-  proprietaire   Proprietaire @relation(fields: [idProprietaire], references: [id])
-  idProprietaire String       @unique
-
-  Voyage Voyage[]
+  Voyages       Voyage[]
+  Proprietaires Proprietaire[]
 }
 
 model Place {

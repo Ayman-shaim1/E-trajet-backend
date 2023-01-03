@@ -18,6 +18,7 @@ CREATE TABLE `Proprietaire` (
     `fixe` VARCHAR(191) NOT NULL,
     `adresse` VARCHAR(191) NOT NULL,
     `idCompte` VARCHAR(191) NOT NULL,
+    `idMoyenneDeTransport` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Proprietaire_idCompte_key`(`idCompte`),
     PRIMARY KEY (`id`)
@@ -42,9 +43,7 @@ CREATE TABLE `MoyenneDeTransport` (
     `isCalculable` BOOLEAN NOT NULL DEFAULT false,
     `cout_par_metre` DOUBLE NOT NULL,
     `description` VARCHAR(191) NOT NULL,
-    `idProprietaire` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `MoyenneDeTransport_idProprietaire_key`(`idProprietaire`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -77,10 +76,10 @@ CREATE TABLE `Voyage` (
 ALTER TABLE `Proprietaire` ADD CONSTRAINT `Proprietaire_idCompte_fkey` FOREIGN KEY (`idCompte`) REFERENCES `Compte`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Passager` ADD CONSTRAINT `Passager_idCompte_fkey` FOREIGN KEY (`idCompte`) REFERENCES `Compte`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Proprietaire` ADD CONSTRAINT `Proprietaire_idMoyenneDeTransport_fkey` FOREIGN KEY (`idMoyenneDeTransport`) REFERENCES `MoyenneDeTransport`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `MoyenneDeTransport` ADD CONSTRAINT `MoyenneDeTransport_idProprietaire_fkey` FOREIGN KEY (`idProprietaire`) REFERENCES `Proprietaire`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Passager` ADD CONSTRAINT `Passager_idCompte_fkey` FOREIGN KEY (`idCompte`) REFERENCES `Compte`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Voyage` ADD CONSTRAINT `Voyage_idProprietaire_fkey` FOREIGN KEY (`idProprietaire`) REFERENCES `Proprietaire`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
