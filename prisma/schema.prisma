@@ -21,11 +21,11 @@ model Compte {
 }
 
 model Proprietaire {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   nomComplete String
-  Gsm         String
-  fixe        String
-  adresse     String
+  gsm         String?
+  fixe        String?
+  adresse     String?
 
   compte   Compte @relation(fields: [idCompte], references: [id])
   idCompte String @unique
@@ -37,10 +37,9 @@ model Proprietaire {
 }
 
 model Passager {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   nomComplete String
-  fixe        String
-  adresse     String
+  gsm         String?
 
   compte   Compte @relation(fields: [idCompte], references: [id])
   idCompte String @unique
@@ -50,23 +49,51 @@ model Passager {
 
 model MoyenneDeTransport {
   id             String  @id @default(uuid())
+  icon           String?
   nom            String
   isCalculable   Boolean @default(false)
-  cout_par_metre Float
-  description    String
+  cout_par_metre Float?
+  description    String?
 
   Voyages       Voyage[]
   Proprietaires Proprietaire[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  path      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ChoixImagePlace ChoixImagePlace[]
+}
+
+model ChoixImagePlace {
+  place   Place  @relation(fields: [idPlace], references: [id])
+  idPlace String
+
+  image   Image  @relation(fields: [idImage], references: [id])
+  idImage String
+
+  @@id([idPlace, idImage])
 }
 
 model Place {
-  id                  String   @id @default(uuid())
-  nom                 String
-  latitude            Float
-  longtitude          Float
-  description         String
+  id          String   @id @default(uuid())
+  nom         String
+  latitude    Float
+  longtitude  Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   voyage_placeDepart  Voyage[] @relation("placeDepart")
   voyage_placeArrivee Voyage[] @relation("placeArrivee")
+
+  ChoixImagePlace ChoixImagePlace[]
 }
 
 model Voyage {
@@ -80,9 +107,9 @@ model Voyage {
   passager             Passager           @relation(fields: [idPassager], references: [id])
   idPassager           String
 
-  placeDepart  Place  @relation("placeDepart", fields: [idPaceDepart], references: [id])
-  idPaceDepart String
+  placeDepart   Place  @relation("placeDepart", fields: [idPlaceDepart], references: [id])
+  idPlaceDepart String
 
-  placeArrivee  Place  @relation("placeArrivee", fields: [idPaceArrivee], references: [id])
-  idPaceArrivee String
+  placeArrivee   Place  @relation("placeArrivee", fields: [idPlaceArrivee], references: [id])
+  idPlaceArrivee String
 }

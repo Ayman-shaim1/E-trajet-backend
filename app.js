@@ -16,7 +16,7 @@ app.use(express.json({ extended: false }));
 
 // Make the uploads folder as static folder :
 const __dirname = path.resolve();
-app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+app.use("/public", express.static(path.join(__dirname, "/public")));
 
 // Define Routes :
 app.use("/api/utilisateurs", utilisateurRoutes);
