@@ -10,41 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Compte {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  motdepasse   String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  Proprietaire Proprietaire?
-  Passager     Passager?
-}
+model Utilisateur {
+  id                   String              @id @default(uuid())
+  email                String              @unique
+  motdepasse           String
+  nomComplete          String
+  gsm                  String?
+  fixe                 String?
+  adresse              String?
+  verifier             Boolean             @default(false)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  moyenneDeTrasnport   MoyenneDeTransport? @relation(fields: [idMoyenneDeTransport], references: [id])
+  idMoyenneDeTransport String?
 
-model Proprietaire {
-  id          String  @id @default(uuid())
-  nomComplete String
-  gsm         String?
-  fixe        String?
-  adresse     String?
-
-  compte   Compte @relation(fields: [idCompte], references: [id])
-  idCompte String @unique
-
-  moyenneDeTransport   MoyenneDeTransport @relation(fields: [idMoyenneDeTransport], references: [id])
-  idMoyenneDeTransport String
-
-  Voyages Voyage[]
-}
-
-model Passager {
-  id          String  @id @default(uuid())
-  nomComplete String
-  gsm         String?
-
-  compte   Compte @relation(fields: [idCompte], references: [id])
-  idCompte String @unique
-
-  Voyages Voyage[]
+  voyagesPassager     Voyage[]           @relation("passager")
+  voyagesProprietaire Voyage[]           @relation("proprietaire")
+  ChoixRole           ChoixRole[]
+  VerificationEmail   VerificationEmail?
 }
 
 model MoyenneDeTransport {
@@ -55,11 +38,11 @@ model MoyenneDeTransport {
   cout_par_metre Float?
   description    String?
 
-  Voyages       Voyage[]
-  Proprietaires Proprietaire[]
+  Voyages Voyage[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Utilisateur Utilisateur[]
 }
 
 model Image {
@@ -97,19 +80,46 @@ model Place {
 }
 
 model Voyage {
-  id                   String             @id @default(uuid())
-  dateVoyage           DateTime
-  statut               String
-  proprietaire         Proprietaire       @relation(fields: [idProprietaire], references: [id])
-  idProprietaire       String
+  id         String   @id @default(uuid())
+  dateVoyage DateTime
+  statut     String
+
+  passager   Utilisateur @relation("passager", fields: [idPassager], references: [id])
+  idPassager String
+
+  proprietaire   Utilisateur @relation("proprietaire", fields: [idProprietaire], references: [id])
+  idProprietaire String
+
   moyenneDeTransport   MoyenneDeTransport @relation(fields: [idMoyenneDeTransport], references: [id])
   idMoyenneDeTransport String
-  passager             Passager           @relation(fields: [idPassager], references: [id])
-  idPassager           String
 
   placeDepart   Place  @relation("placeDepart", fields: [idPlaceDepart], references: [id])
   idPlaceDepart String
 
   placeArrivee   Place  @relation("placeArrivee", fields: [idPlaceArrivee], references: [id])
   idPlaceArrivee String
+}
+
+model Role {
+  libelle   String      @id
+  ChoixRole ChoixRole[]
+}
+
+model ChoixRole {
+  Utilisateur   Utilisateur @relation(fields: [idUtilisateur], references: [id])
+  idUtilisateur String
+  Role          Role        @relation(fields: [role], references: [libelle])
+  role          String
+
+  @@id([idUtilisateur, role])
+}
+
+model VerificationEmail {
+  Utilisateur   Utilisateur @relation(fields: [idUtilisateur], references: [id])
+  idUtilisateur String      @unique
+
+  token          String
+  dateExpiration DateTime
+
+  @@id([token, idUtilisateur])
 }

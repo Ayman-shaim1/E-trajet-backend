@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-import User from "../models/userModel.js";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const protect = asyncHandler(async (req, res, next) => {
   let token;
@@ -11,7 +12,11 @@ export const protect = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers["authorization"].split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id);
+      const user = await prisma.utilisateur.findUnique({
+        where: {
+          id: decoded.id,
+        },
+      });
       req.user = user;
 
       next();
@@ -27,11 +32,40 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-export const admin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
+export const passager = async (req, res, next) => {
+  const roles = await prisma.choixRole.findMany({
+    select: {
+      role: true,
+    },
+    where: {
+      idUtilisateur: req.user.id,
+    },
+  });
+
+  const index = roles.findIndex(role => role.role === "passager");
+  if (index !== -1) {
     next();
   } else {
     res.status(401);
-    throw new Error("Not authorize as an admin ");
+    throw new Error("Non autorisé en tant que passager ");
+  }
+};
+
+export const proprietaire = async (req, res, next) => {
+  const roles = await prisma.choixRole.findMany({
+    select: {
+      role: true,
+    },
+    where: {
+      idUtilisateur: req.user.id,
+    },
+  });
+
+  const index = roles.findIndex(role => role.role === "proprietaire");
+  if (index !== -1) {
+    next();
+  } else {
+    res.status(401);
+    throw new Error("Non autorisé en tant que proprietaire ");
   }
 };

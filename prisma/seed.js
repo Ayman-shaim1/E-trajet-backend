@@ -11,67 +11,6 @@ const importData = async () => {
     const password = await bcrypt.hash("123456", salt);
 
     // creation de donnees js :
-
-    const comptes = [
-      {
-        id: uuidv4(),
-        email: "jhon@example.com",
-        motdepasse: password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: uuidv4(),
-        email: "steve@example.com",
-        motdepasse: password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: uuidv4(),
-        email: "richard@example.com",
-        motdepasse: password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: uuidv4(),
-        email: "max@example.com",
-        motdepasse: password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: uuidv4(),
-        email: "tramway@example.com",
-        motdepasse: password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: uuidv4(),
-        email: "alsa@example.com",
-        motdepasse: password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
-
-    const passagers = [
-      {
-        id: uuidv4(),
-        nomComplete: "John Doe",
-        gsm: "+212 06 11 22 33 44",
-        idCompte: comptes[0].id,
-      },
-      {
-        id: uuidv4(),
-        nomComplete: "Steve Smith",
-        gsm: "+212 06 55 66 77 88",
-        idCompte: comptes[1].id,
-      },
-    ];
-
     const moyenneDeTransports = [
       {
         id: uuidv4(),
@@ -101,43 +40,90 @@ const importData = async () => {
       },
     ];
 
-    const proprietaires = [
+    const utilisateurs = [
       {
         id: uuidv4(),
-        nomComplete: "Richard Roe",
-        gsm: "+212 06 10 11 12 13",
+        verifier: true,
+        email: "jhon@example.com",
+        nomComplete: "Jhon Doe",
+        motdepasse: password,
+        gsm: "+212 06 11 11 11 11",
+        // fixe: "+212 05 12 12 12 12",
         adresse:
           "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem magni vitae ratione.",
-        idCompte: comptes[2].id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: uuidv4(),
+        verifier: true,
+        email: "steve@example.com",
+        nomComplete: "Steve Smith",
+
+        motdepasse: password,
+        gsm: "+212 06 22 22 22 22",
+        // fixe: "+212 05 12 12 12 12",
+        adresse:
+          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem magni vitae ratione.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: uuidv4(),
+        verifier: true,
+        email: "richard@example.com",
+        nomComplete: "Richard Roe",
+        motdepasse: password,
+        gsm: "+212 06 33 33 33 33",
+        fixe: "+212 05 33 33 33 33",
+        adresse:
+          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem magni vitae ratione.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
         idMoyenneDeTransport: moyenneDeTransports[0].id,
       },
       {
         id: uuidv4(),
+        verifier: true,
+        email: "max@example.com",
         nomComplete: "Max Mayer",
-        gsm: "+212 06 33 33 44 44",
+        motdepasse: password,
+        gsm: "+212 06 44 44 44 44",
+        fixe: "+212 05 44 44 44 44",
         adresse:
           "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem magni vitae ratione.",
-        idCompte: comptes[3].id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         idMoyenneDeTransport: moyenneDeTransports[1].id,
       },
       {
         id: uuidv4(),
+        verifier: true,
+        email: "tramway@example.com",
         nomComplete: "Societe Tram-Way",
-        gsm: "+212 06 99 98 89 00",
-        fixe: "+212 05 12 12 12 12",
+
+        motdepasse: password,
+        gsm: "+212 06 55 55 55 55",
+        fixe: "+212 05 55 55 55 55",
         adresse:
           "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem magni vitae ratione.",
-        idCompte: comptes[4].id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         idMoyenneDeTransport: moyenneDeTransports[2].id,
       },
       {
         id: uuidv4(),
+        verifier: true,
+        email: "alsa@example.com",
         nomComplete: "Societe Alsa-Bus",
-        gsm: "+212 06 00 00 77 77",
-        fixe: "+212 05 15 15 15 15",
+
+        motdepasse: password,
+        gsm: "+212 06 55 55 55 55",
+        fixe: "+212 05 55 55 55 55",
         adresse:
           "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem magni vitae ratione.",
-        idCompte: comptes[5].id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         idMoyenneDeTransport: moyenneDeTransports[3].id,
       },
     ];
@@ -175,18 +161,48 @@ const importData = async () => {
       },
     ];
 
+    const roles = [
+      {
+        libelle: "admin",
+      },
+      {
+        libelle: "passager",
+      },
+      {
+        libelle: "proprietaire",
+      },
+    ];
+
+    const choxRoles = [
+      {
+        idUtilisateur: utilisateurs[0].id,
+        role: "passager",
+      },
+      {
+        idUtilisateur: utilisateurs[1].id,
+        role: "passager",
+      },
+      {
+        idUtilisateur: utilisateurs[2].id,
+        role: "proprietaire",
+      },
+      {
+        idUtilisateur: utilisateurs[3].id,
+        role: "proprietaire",
+      },
+      {
+        idUtilisateur: utilisateurs[4].id,
+        role: "proprietaire",
+      },
+    ];
+
     await prisma.$transaction([
-      prisma.compte.createMany({
-        data: comptes,
-      }),
       prisma.moyenneDeTransport.createMany({
         data: moyenneDeTransports,
       }),
-      prisma.passager.createMany({
-        data: passagers,
-      }),
-      prisma.proprietaire.createMany({
-        data: proprietaires,
+
+      prisma.utilisateur.createMany({
+        data: utilisateurs,
       }),
       prisma.image.createMany({
         data: images,
@@ -196,6 +212,12 @@ const importData = async () => {
       }),
       prisma.ChoixImagePlace.createMany({
         data: choixImagesPlace,
+      }),
+      prisma.role.createMany({
+        data: roles,
+      }),
+      prisma.ChoixRole.createMany({
+        data: choxRoles,
       }),
     ]);
 
@@ -210,15 +232,14 @@ const importData = async () => {
 const destroyData = async () => {
   try {
     await prisma.$transaction([
-      prisma.voyage.deleteMany({}),
-      prisma.proprietaire.deleteMany({}),
-      prisma.passager.deleteMany({}),
-      prisma.moyenneDeTransport.deleteMany({}),
-      prisma.image.deleteMany({}),
+      prisma.ChoixRole.deleteMany({}),
+      prisma.role.deleteMany({}),
+      prisma.ChoixImagePlace.deleteMany({}),
       prisma.place.deleteMany({}),
-      prisma.choixImagePlace.deleteMany({}),
-
-      prisma.compte.deleteMany({}),
+      prisma.image.deleteMany({}),
+      prisma.verificationEmail.deleteMany({}),
+      prisma.utilisateur.deleteMany({}),
+      prisma.moyenneDeTransport.deleteMany({}),
     ]);
     console.log(`Data destroyed !`.red.inverse);
     process.exit();

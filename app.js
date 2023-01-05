@@ -5,6 +5,7 @@ import path from "path";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
 import utilisateurRoutes from "./routes/utilisateurRoutes.js";
+import moyenneDeTransportRoutes from "./routes/moyenneDeTransportRoutes.js";
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.use("/public", express.static(path.join(__dirname, "/public")));
 
 // Define Routes :
 app.use("/api/utilisateurs", utilisateurRoutes);
+app.use("/api/moyennesdetransports", moyenneDeTransportRoutes);
+
 app.get("/", (req, res) => res.send("API is running..."));
 
 // Init Error Middlewares :
