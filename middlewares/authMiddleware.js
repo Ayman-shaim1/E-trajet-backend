@@ -47,7 +47,9 @@ export const passager = async (req, res, next) => {
     next();
   } else {
     res.status(401);
-    throw new Error("Non autorisé en tant que passager ");
+    res.json({ message: "Non autorisé en tant que proprietaire" });
+
+    // throw new Error("Non autorisé en tant que passager ");
   }
 };
 
@@ -66,6 +68,7 @@ export const proprietaire = async (req, res, next) => {
     next();
   } else {
     res.status(401);
-    throw new Error("Non autorisé en tant que proprietaire ");
+    res.json({ message: "Non autorisé en tant que proprietaire" });
+    // throw new Error("Non autorisé en tant que proprietaire");
   }
 };
