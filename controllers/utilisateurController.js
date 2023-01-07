@@ -3,7 +3,9 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-import nodemailer from "nodemailer";
+import { sendEmail } from "../services/mailServices.js";
+import { excludeUserFields } from "../services/prismaServices.js";
+
 const prisma = new PrismaClient();
 
 // @desc    Creation d'un nouveau utilisateur
@@ -20,71 +22,73 @@ export const incription = asyncHandler(async (req, res) => {
       adresse,
       idMoyenneDeTransport,
     } = req.body;
+    // check if user existe or not :
     let utilisateur = null;
-
     utilisateur = await prisma.utilisateur.findUnique({
       where: {
         email: email,
       },
     });
     if (!utilisateur) {
+      const tokenID = uuidv4();
       const salt = await bcrypt.genSalt(10);
       const crpmotdepasse = await bcrypt.hash(motdepasse, salt);
-      const tokenID = uuidv4();
-      const smtpTransport = nodemailer.createTransport({
-        service: "Gmail",
-        secure: false,
-        tls: {
-          rejectUnauthorized: false,
-        },
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.PASSWORD_EMAIL,
-        },
-      });
-      const link = "http://" + req.get("host") + "/verify?id=" + tokenID;
 
-      const utilisateur = await prisma.utilisateur.create({
-        data: {
-          email,
-          motdepasse: crpmotdepasse,
-          nomComplete,
-          gsm: gsm ? gsm : null,
-          fixe: fixe ? fixe : null,
-          adresse: adresse ? adresse : null,
-          idMoyenneDeTransport: idMoyenneDeTransport
-            ? idMoyenneDeTransport
-            : null,
-        },
-      });
-      const mailOptions = {
-        to: utilisateur.email,
-        subject: "Veulliez confirmer votre email",
-        html:
-          "Bonjour,<br> veulliez cliquer sur ce lien pour verfier votre email.<br><a href=" +
-          link +
-          ">cliquer ici pour verfier</a>",
-      };
+      // start transaction :
+      await prisma.$transaction(async tx => {
+        // create user :
+        utilisateur = await prisma.utilisateur.create({
+          data: {
+            email,
+            motdepasse: crpmotdepasse,
+            nomComplete,
+            gsm: gsm ? gsm : null,
+            fixe: fixe ? fixe : null,
+            adresse: adresse ? adresse : null,
+            idMoyenneDeTransport: idMoyenneDeTransport
+              ? idMoyenneDeTransport
+              : null,
+          },
+        });
+        // give him role :
+        await prisma.choixRole.create({
+          data: {
+            idUtilisateur: utilisateur.id,
+            role: utilisateur.idMoyenneDeTransport
+              ? "proprietaire"
+              : "passager",
+          },
+        });
+        // create verification token :
 
-      await prisma.verificationEmail.create({
-        data: {
-          idUtilisateur: utilisateur.id,
-          token: tokenID,
-          dateExpiration: new Date(
-            new Date().setDate(new Date().getDate() + 1)
-          ),
-        },
+        // await prisma.verificationEmail.create({
+        //   data: {
+        //     idUtilisateur: utilisateur.id,
+        //     token: tokenID,
+        //     dateExpiration: new Date(
+        //       new Date().setDate(new Date().getDate() + 1)
+        //     ),
+        //   },
+        // });
       });
 
-      smtpTransport.sendMail(mailOptions, (error, response) => {
-        if (error) {
-          res.status(400);
-          throw new Error(error);
-        } else {
-          return res.json({
-            message: `Un e-mail de vérification a été envoyé à '${utilisateur.email}'. Il expirera après un jour. Si vous ne recevez pas d'e-mail de vérification, cliquez sur Renvoyer`,
-          });
-        }
+      // send email :
+
+      // const url = "http://" + req.get("host") + "/verify?id=" + tokenID;
+
+      // const subject = "Veulliez confirmer votre email";
+      // const content = `Bonjour,<br> veulliez cliquer sur ce lien pour verfier votre email.<br><a href=${url}>cliquer ici pour verfier</a>`;
+
+      // sendEmail({
+      //   from: process.env.EMAIL,
+      //   to: utilisateur.email,
+      //   subject: subject,
+      //   content: content,
+      // });
+
+      res.json({
+        message:
+          "un message a été envoyé sur votre boite mail. merci de vérifier votre email",
       });
     } else {
       res.status(400);
@@ -102,7 +106,7 @@ export const incription = asyncHandler(async (req, res) => {
 export const authentification = asyncHandler(async (req, res) => {
   const { email, motdepasse } = req.body;
 
-  const utilisateur = await prisma.utilisateur.findFirst({
+  let utilisateur = await prisma.utilisateur.findFirst({
     where: {
       email: {
         equals: email,
@@ -116,6 +120,11 @@ export const authentification = asyncHandler(async (req, res) => {
   if (utilisateur) {
     if (await bcrypt.compare(motdepasse, utilisateur.motdepasse)) {
       if (utilisateur.verifier) {
+        utilisateur.roles = utilisateur.ChoixRole.map(role => role.role);
+
+        delete utilisateur.motdepasse;
+        delete utilisateur.ChoixRole;
+
         res.json({
           ...utilisateur,
           token: generateToken(utilisateur.id),

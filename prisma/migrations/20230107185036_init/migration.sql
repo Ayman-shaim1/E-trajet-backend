@@ -100,6 +100,19 @@ CREATE TABLE `VerificationEmail` (
     PRIMARY KEY (`token`, `idUtilisateur`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `ContactUsMessage` (
+    `id` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `gsm` VARCHAR(191) NOT NULL,
+    `nomComplete` VARCHAR(191) NOT NULL,
+    `message` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Utilisateur` ADD CONSTRAINT `Utilisateur_idMoyenneDeTransport_fkey` FOREIGN KEY (`idMoyenneDeTransport`) REFERENCES `MoyenneDeTransport`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 

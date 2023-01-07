@@ -8,6 +8,6 @@ import {
 
 const router = express.Router();
 
-router.route("/").get(protect, proprietaire, getMoyennesDeTransports);
+router.route("/").get(protect, passager, getMoyennesDeTransports);
 
 export default router;

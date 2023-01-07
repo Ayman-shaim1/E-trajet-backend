@@ -25,14 +25,13 @@ export const protect = asyncHandler(async (req, res, next) => {
       throw new Error("Not authorized, token failed");
     }
   }
-
   if (!token) {
     res.status(401);
     throw new Error("Not authorized, no token");
   }
 });
 
-export const passager = async (req, res, next) => {
+export const passager = asyncHandler(async (req, res, next) => {
   const roles = await prisma.choixRole.findMany({
     select: {
       role: true,
@@ -48,12 +47,11 @@ export const passager = async (req, res, next) => {
   } else {
     res.status(401);
     res.json({ message: "Non autorisé en tant que proprietaire" });
-
     // throw new Error("Non autorisé en tant que passager ");
   }
-};
+});
 
-export const proprietaire = async (req, res, next) => {
+export const proprietaire = asyncHandler(async (req, res, next) => {
   const roles = await prisma.choixRole.findMany({
     select: {
       role: true,
@@ -71,4 +69,4 @@ export const proprietaire = async (req, res, next) => {
     res.json({ message: "Non autorisé en tant que proprietaire" });
     // throw new Error("Non autorisé en tant que proprietaire");
   }
-};
+});

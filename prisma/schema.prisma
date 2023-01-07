@@ -123,3 +123,14 @@ model VerificationEmail {
 
   @@id([token, idUtilisateur])
 }
+
+model ContactUsMessage {
+  id          String @id @default(uuid())
+  email       String
+  gsm         String
+  nomComplete String
+  message     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
